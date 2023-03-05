@@ -78,38 +78,50 @@ const noSourceRepoSentinel = "_not_a_valid_repository_name"
 func New(opts ...Option) (*Runfiles, error) {
 	var o options
 	o.sourceRepo = noSourceRepoSentinel
+	var infoMap map[string]string
+	m = make(map[string]string)
+	m["manifest"]=o.manifest
 	for _, a := range opts {
+		fmt.println("1")
 		a.apply(&o)
 	}
 
 	if o.sourceRepo == noSourceRepoSentinel {
+		fmt.println("2")
 		o.sourceRepo = SourceRepo(CallerRepository())
 	}
 
 	if o.manifest == "" {
+		fmt.println("3")
 		o.manifest = ManifestFile(os.Getenv(manifestFileVar))
 	}
 	if o.manifest != "" {
+		fmt.println("4")
 		return o.manifest.new(o.sourceRepo)
 	}
 
 	if o.directory == "" {
+		fmt.println("5")
 		o.directory = Directory(os.Getenv(directoryVar))
 	}
 	if o.directory != "" {
+		fmt.println("6")
 		return o.directory.new(o.sourceRepo)
 	}
 
 	if o.program == "" {
+		fmt.println("7")
 		o.program = ProgramName(os.Args[0])
 	}
 	manifest := ManifestFile(o.program + ".runfiles_manifest")
 	if stat, err := os.Stat(string(manifest)); err == nil && stat.Mode().IsRegular() {
+		fmt.println("8")
 		return manifest.new(o.sourceRepo)
 	}
 
 	dir := Directory(o.program + ".runfiles")
 	if stat, err := os.Stat(string(dir)); err == nil && stat.IsDir() {
+		fmt.println("9")
 		return dir.new(o.sourceRepo)
 	}
 
